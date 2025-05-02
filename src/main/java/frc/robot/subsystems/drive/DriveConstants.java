@@ -21,10 +21,10 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 
 public class DriveConstants {
-  public static final double maxSpeedMetersPerSec = 4.8;
+  public static final double maxSpeedMetersPerSec = 5.1; //What the swerve module says //4.8
   public static final double odometryFrequency = 100.0; // Hz
-  public static final double trackWidth = Units.inchesToMeters(26.5);
-  public static final double wheelBase = Units.inchesToMeters(26.5);
+  public static final double trackWidth = Units.inchesToMeters(26.5); //Supposed to update this: I think its accurate but should make sure
+  public static final double wheelBase = Units.inchesToMeters(26.5); //Supposed to update this: I think its accurate but should make sure
   public static final double driveBaseRadius = Math.hypot(trackWidth / 2.0, wheelBase / 2.0);
   public static final Translation2d[] moduleTranslations =
       new Translation2d[] {
@@ -41,23 +41,25 @@ public class DriveConstants {
   public static final Rotation2d backRightZeroRotation = new Rotation2d(0.0);
 
   // Device CAN IDs
-  public static final int pigeonCanId = 9;
+  public static final int pigeonCanId = 9; //We arn't using a pigeon or Navx 
+  public static final int gyroID = 30; //We're using the Redux Gyro: range from 0-1
+  public static final double gyroYawConversionFactor = 360; //When you get yaw multiply it by gyroYawConversionFactor
 
-  public static final int frontLeftDriveCanId = 1;
-  public static final int backLeftDriveCanId = 3;
-  public static final int frontRightDriveCanId = 5;
-  public static final int backRightDriveCanId = 7;
+  public static final int frontLeftDriveCanId = 8;
+  public static final int backLeftDriveCanId = 2;
+  public static final int frontRightDriveCanId = 6;
+  public static final int backRightDriveCanId = 4;
 
-  public static final int frontLeftTurnCanId = 2;
-  public static final int backLeftTurnCanId = 4;
-  public static final int frontRightTurnCanId = 6;
-  public static final int backRightTurnCanId = 8;
+  public static final int frontLeftTurnCanId = 1;
+  public static final int backLeftTurnCanId = 3;
+  public static final int frontRightTurnCanId = 7;
+  public static final int backRightTurnCanId = 5;
 
   // Drive motor configuration
   public static final int driveMotorCurrentLimit = 50;
-  public static final double wheelRadiusMeters = Units.inchesToMeters(1.5);
-  public static final double driveMotorReduction =
-      (45.0 * 22.0) / (14.0 * 15.0); // MAXSwerve with 14 pinion teeth and 22 spur teeth
+  public static final double wheelRadiusMeters = 0.1016 / 2; //Copied from 2025 Reefscape //Units.inchesToMeters(1.5);
+  public static final double driveMotorReduction = 1.0 / 6.75; //Copied from 2025 Reefscape Swerve Code
+      //(45.0 * 22.0) / (14.0 * 15.0); // MAXSwerve with 14 pinion teeth and 22 spur teeth
   public static final DCMotor driveGearbox = DCMotor.getNeoVortex(1);
 
   // Drive encoder configuration
@@ -79,8 +81,8 @@ public class DriveConstants {
   // Turn motor configuration
   public static final boolean turnInverted = false;
   public static final int turnMotorCurrentLimit = 20;
-  public static final double turnMotorReduction = 9424.0 / 203.0;
-  public static final DCMotor turnGearbox = DCMotor.getNeo550(1);
+  public static final double turnMotorReduction = 9424.0 / 203.0; //TODO: Need to find turn motor reduction because I have no clue
+  public static final DCMotor turnGearbox = DCMotor.getNEO(1); //Pretty sure we are using NEO's on turn motors
 
   // Turn encoder configuration
   public static final boolean turnEncoderInverted = true;
