@@ -353,7 +353,6 @@ public class Drive extends SubsystemBase {
   public double getMaxAngularSpeedRadPerSec() {
     return maxSpeedMetersPerSec / driveBaseRadius;
   }
-}
 
 public void fieldOrientedDrive(double speedX, double speedY, double rot) {
   ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(speedX, speedY, rot,
@@ -408,8 +407,11 @@ private void drive(ChassisSpeeds speeds) {
   SwerveModuleState[] moduleStates = kinematics.toSwerveModuleStates(speeds, new Translation2d(0, 0));
   SwerveDriveKinematics.desaturateWheelSpeeds(moduleStates, MAX_VELOCITY);
 
-  this.frontRight.drive(moduleStates[0]);
-  this.frontRight.drive(moduleStates[1]);
-  this.backLeft.drive(moduleStates[2]);
-  this.backRight.drive(moduleStates[3]);
+
+  modules[0].runSetpoint(moduleStates[0]);
+  modules[1].runSetpoint(moduleStates[1]);
+  modules[2].runSetpoint(moduleStates[2]);
+  modules[3].runSetpoint(moduleStates[3]);
+  
+}
 }

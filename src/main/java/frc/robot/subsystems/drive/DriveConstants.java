@@ -68,6 +68,8 @@ public class DriveConstants {
   public static final double driveEncoderVelocityFactor =
       (2 * Math.PI) / 60.0 / driveMotorReduction; // Rotor RPM -> Wheel Rad/Sec
 
+  public static final double slewRate = 20;
+
   // Drive PID configuration
   public static final double driveKp = 0.0;
   public static final double driveKd = 0.0;
@@ -114,5 +116,5 @@ public class DriveConstants {
               1),
           moduleTranslations);
 
-  
+public static final double deadband = 0.08;
 }
