@@ -26,8 +26,10 @@ import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Twist2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -35,10 +37,14 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -51,7 +57,13 @@ import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Drive extends SubsystemBase {
+
+  
   static final Lock odometryLock = new ReentrantLock();
+  private final static double DRIVE_REDUCTION = 1.0 / 6.75;
+    private final static double NEO_FREE_SPEED = 5820.0 / 60.0;
+     private final static double WHEEL_DIAMETER = 0.1016;
+   private static final double MAX_VELOCITY = NEO_FREE_SPEED * DRIVE_REDUCTION * WHEEL_DIAMETER * Math.PI;;
   private final GyroIO gyroIO;
   private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
   private final Module[] modules = new Module[4]; // FL, FR, BL, BR
@@ -121,6 +133,27 @@ public class Drive extends SubsystemBase {
                 (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
             new SysIdRoutine.Mechanism(
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
+
+    // SmartDashboard.putData("Swerve Drive", new Sendable() {
+    //   @Override
+    //   public void initSendable(SendableBuilder builder) {
+    //     builder.setSmartDashboardType("SwerveDrive");
+    
+    //     builder.addDoubleProperty("Front Left Angle", () -> frontLeft.getEncoderRadians(), null);
+    //     builder.addDoubleProperty("Front Left Velocity", () -> frontLeft.getState().speedMetersPerSecond, null);
+    
+    //     builder.addDoubleProperty("Front Right Angle", () -> frontRight.getEncoderRadians(), null);
+    //     builder.addDoubleProperty("Front Right Velocity", () -> frontRight.getState().speedMetersPerSecond, null);
+    
+    //     builder.addDoubleProperty("Back Left Angle", () -> backLeft.getEncoderRadians(), null);
+    //     builder.addDoubleProperty("Back Left Velocity", () -> backLeft.getState().speedMetersPerSecond, null);
+    
+    //     builder.addDoubleProperty("Back Right Angle", () -> backRight.getEncoderRadians(), null);
+    //     builder.addDoubleProperty("Back Right Velocity", () -> backRight.getState().speedMetersPerSecond, null);
+    
+    //     builder.addDoubleProperty("Robot Angle", () -> getFieldAngle(), null);
+    //   }
+    // });
   }
 
   @Override
@@ -320,4 +353,63 @@ public class Drive extends SubsystemBase {
   public double getMaxAngularSpeedRadPerSec() {
     return maxSpeedMetersPerSec / driveBaseRadius;
   }
+}
+
+public void fieldOrientedDrive(double speedX, double speedY, double rot) {
+  ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(speedX, speedY, rot,
+    poseEstimator.getEstimatedPosition().getRotation());
+  this.drive(speeds);
+}
+
+public void defaultDrive(double speedX, double speedY, double rot) {
+  defaultDrive(speedX, speedY, rot, true);
+}
+public void autoDrive(double speedX, double speedY, double rot, Rotation2d goalAngle) {
+  defaultAutoDrive(speedX, speedY, rot, true, goalAngle);
+}
+
+
+private SlewRateLimiter slewRateX = new SlewRateLimiter(DriveConstants.slewRate);
+private SlewRateLimiter slewRateY = new SlewRateLimiter(DriveConstants.slewRate);
+
+public boolean isFieldOriented;
+public void defaultDrive(double speedX, double speedY, double rot, boolean slew) {
+ 
+  if (slew) {
+    speedX = slewRateX.calculate(speedX);
+    speedY = slewRateY.calculate(speedY);
+  }
+
+  if (isFieldOriented) {
+    fieldOrientedDrive(speedX, speedY, rot);
+    isFieldOriented = true;
+  } else {
+    fieldOrientedDrive(-speedX, -speedY, rot);
+    isFieldOriented = false;
+  }
+}
+public void defaultAutoDrive(double speedX, double speedY, double rot, boolean slew, Rotation2d goalAngle) {
+ 
+  if (slew) {
+    speedX = slewRateX.calculate(speedX);
+    speedY = slewRateY.calculate(speedY);
+  }
+
+  ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(speedX, speedY, rot, goalAngle);
+  this.drive(speeds);
+}
+
+/** drive:
+ * Move the robot. Given the requested chassis speed (where do we want to go) in meters/sec and radians.
+ * moduleStates are in meters/sec and radians (for rotation).
+ * This can be a source of angle mismatch degrees <> radians
+ */
+private void drive(ChassisSpeeds speeds) {
+  SwerveModuleState[] moduleStates = kinematics.toSwerveModuleStates(speeds, new Translation2d(0, 0));
+  SwerveDriveKinematics.desaturateWheelSpeeds(moduleStates, MAX_VELOCITY);
+
+  this.frontRight.drive(moduleStates[0]);
+  this.frontRight.drive(moduleStates[1]);
+  this.backLeft.drive(moduleStates[2]);
+  this.backRight.drive(moduleStates[3]);
 }

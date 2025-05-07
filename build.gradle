@@ -134,11 +134,11 @@ tasks.register("deployEvent", Exec) {
     finalizedBy tasks.named("deploy")
 }
 
-tasks.register("deployAlerts", JavaExec) {
-    mainClass = "DeployAlerts"
-    classpath = sourceSets.test.runtimeClasspath
-}
-tasks.getByName("deploy").dependsOn(tasks.getByName("deployAlerts"))
+// tasks.register("deployAlerts", JavaExec) {
+//     mainClass = "DeployAlerts"
+//     classpath = sourceSets.test.runtimeClasspath
+// }
+// tasks.getByName("deploy").dependsOn(tasks.getByName("deployAlerts"))
 
 // https://gist.github.com/falOn-Dev/512c62e009025b3b7569b899bbef955a
 
