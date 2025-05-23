@@ -117,19 +117,19 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     // Default command, normal field-relative drive
-    drive.setDefaultCommand(
-        new DefaultDrive(
-            drive,
-            () -> getScaledXY(),
-            () -> scaleRotationAxis(controller.getRawAxis(4))));
-
-
     // drive.setDefaultCommand(
-    //     DriveCommands.joystickDrive(
+    //     new DefaultDrive(
     //         drive,
-    //         () -> -controller.getLeftY(),
-    //         () -> -controller.getLeftX(),
-    //         () -> -controller.getRightX()));
+    //         () -> getScaledXY(),
+    //         () -> scaleRotationAxis(controller.getRawAxis(4))));
+
+
+    drive.setDefaultCommand(
+         DriveCommands.joystickDrive(
+             drive,
+             () -> controller.getLeftY(),
+             () -> controller.getLeftX(),
+             () -> -controller.getRightX()));
 
     // Lock to 0° when A button is held
     // controller
