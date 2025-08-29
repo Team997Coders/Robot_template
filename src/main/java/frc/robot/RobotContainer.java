@@ -15,7 +15,6 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.subsystems.vision.VisionConstants.*;
-import static frc.robot.subsystems.vision.VisionConstants.robotToCamera1;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -28,8 +27,11 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.goToLocation;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.vision.*;
+import java.util.Arrays;
+import java.util.List;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
 import org.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeCoralOnFly;
@@ -52,6 +54,8 @@ public class RobotContainer {
 
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
+
+    private final List<Pose2d> potentialLocations = potentialLocations();
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
@@ -143,7 +147,7 @@ public class RobotContainer {
         //                 drive, () -> -controller.getLeftY(), () -> -controller.getLeftX(), () -> new Rotation2d()));
 
         // Switch to X pattern when X button is pressed
-        controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+        controller.x().whileTrue(new goToLocation(drive, potentialLocations));
 
         // Reset gyro / odometry
         final Runnable resetGyro = Constants.currentMode == Constants.Mode.SIM
@@ -178,6 +182,49 @@ public class RobotContainer {
                             MetersPerSecond.of(1.5),
                             Degrees.of(-60)))));
         }
+    }
+
+    public List<Pose2d> potentialLocations() {
+        List<Pose2d> locations = Arrays.asList();
+        List<Integer> tagsSource = Arrays.asList(12, 13, 1, 2);
+        List<Integer> tagsReef = Arrays.asList(6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 21, 22);
+
+        double frontBackOffset = 0.0254 * 18.5;
+        double leftRightOffset = 0.0254 * 6.5;
+
+        for (int i = 0; i < 12; i++) {
+            int tag = tagsReef.get(i);
+
+            Pose2d location = aprilTagLayout.getTagPose(tag).orElseThrow().toPose2d();
+
+            for (int j = 0; j < 2; j++) {
+                leftRightOffset = leftRightOffset * -1;
+
+                double rot = location.getRotation().getRadians();
+
+                double x = location.getX() + Math.cos(rot) * frontBackOffset + Math.sin(rot) * leftRightOffset;
+
+                double y = location.getY() + Math.cos(rot) * leftRightOffset + Math.sin(rot) * frontBackOffset;
+
+                locations.add(new Pose2d(x, y, new Rotation2d(rot)));
+            }
+        }
+
+        for (int i = 0; i < 4; i++) {
+            int tag = tagsSource.get(i);
+
+            Pose2d location = aprilTagLayout.getTagPose(tag).orElseThrow().toPose2d();
+
+            double rot = location.getRotation().getRadians();
+
+            double x = location.getX() + Math.cos(rot) * frontBackOffset;
+
+            double y = location.getY() + Math.sin(rot) * frontBackOffset;
+
+            locations.add(new Pose2d(x, y, new Rotation2d(rot)));
+        }
+
+        return locations;
     }
 
     /**
