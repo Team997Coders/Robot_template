@@ -199,6 +199,26 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
         Logger.recordOutput("SwerveStates/SetpointsOptimized", setpointStates);
     }
 
+    // Offsets swerve wheels by offset
+    public void runVelocityOffsets(ChassisSpeeds speeds, double angleOffsets) {
+        // Calculate module setpoints
+        speeds = ChassisSpeeds.discretize(speeds, 0.02);
+        SwerveModuleState[] setpointStates = kinematics.toSwerveModuleStates(speeds);
+        SwerveDriveKinematics.desaturateWheelSpeeds(setpointStates, maxSpeedMetersPerSec);
+
+        // Log unoptimized setpoints
+        Logger.recordOutput("SwerveStates/Setpoints", setpointStates);
+        Logger.recordOutput("SwerveChassisSpeeds/Setpoints", speeds);
+
+        // Send setpoints to modules
+        for (int i = 0; i < 4; i++) {
+            modules[i].runSetpointOffsets(setpointStates[i], angleOffsets);
+        }
+
+        // Log optimized setpoints (runSetpoint mutates each state)
+        Logger.recordOutput("SwerveStates/SetpointsOptimized", setpointStates);
+    }
+
     /** Runs the drive in a straight line with the specified drive output. */
     public void runCharacterization(double output) {
         for (int i = 0; i < 4; i++) {

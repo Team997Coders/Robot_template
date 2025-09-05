@@ -55,7 +55,8 @@ public class RobotContainer {
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
 
-    private final List<Pose2d> potentialLocations = potentialLocations();
+    // private final Pose2d[] potentialLocations = potentialLocations();
+    private final Pose2d[] potentialLocations = {new Pose2d(15, 4, new Rotation2d(0))};
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
@@ -184,8 +185,8 @@ public class RobotContainer {
         }
     }
 
-    public List<Pose2d> potentialLocations() {
-        List<Pose2d> locations = Arrays.asList();
+    public Pose2d[] potentialLocations() {
+        Pose2d[] locations = {null};
         List<Integer> tagsSource = Arrays.asList(12, 13, 1, 2);
         List<Integer> tagsReef = Arrays.asList(6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 21, 22);
 
@@ -206,7 +207,7 @@ public class RobotContainer {
 
                 double y = location.getY() + Math.cos(rot) * leftRightOffset + Math.sin(rot) * frontBackOffset;
 
-                locations.add(new Pose2d(x, y, new Rotation2d(rot)));
+                locations[locations.length - 1] = (new Pose2d(x, y, new Rotation2d(rot)));
             }
         }
 
@@ -221,7 +222,7 @@ public class RobotContainer {
 
             double y = location.getY() + Math.sin(rot) * frontBackOffset;
 
-            locations.add(new Pose2d(x, y, new Rotation2d(rot)));
+            locations[locations.length - 1] = (new Pose2d(x, y, new Rotation2d(rot)));
         }
 
         return locations;

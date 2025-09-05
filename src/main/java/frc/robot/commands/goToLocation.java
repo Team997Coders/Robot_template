@@ -1,9 +1,8 @@
 package frc.robot.commands;
 
-import java.util.List;
-
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
@@ -12,128 +11,153 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.Drive;
 
 public class goToLocation extends Command {
-  
-  private Drive drivebase;
-  private Pose2d goalPose;
 
-  private static final TrapezoidProfile.Constraints X_CONSTRAINTS = new TrapezoidProfile.Constraints(1.5, 2);
-  private static final TrapezoidProfile.Constraints Y_CONSTRAINTS = new TrapezoidProfile.Constraints(1.5, 2); 
-  private static final TrapezoidProfile.Constraints THETA_CONSTRAINTS = new TrapezoidProfile.Constraints(60, 60);
-  
-  private final ProfiledPIDController xController = new ProfiledPIDController(5, 0, .2, X_CONSTRAINTS);
-  private final ProfiledPIDController yController = new ProfiledPIDController(5, 0, .2, Y_CONSTRAINTS);
-  private final ProfiledPIDController thetaController = new ProfiledPIDController(3, 0, 0, THETA_CONSTRAINTS);
+    private Drive drivebase;
+    private Pose2d goalPose;
 
-  @SuppressWarnings("unused")
-  private double xStart = 0;
-  @SuppressWarnings("unused")
-  private double yStart = 0;
-  @SuppressWarnings("unused")
-  private double thetaStart = 0;
+    private static final TrapezoidProfile.Constraints X_CONSTRAINTS = new TrapezoidProfile.Constraints(1.5, 2);
+    private static final TrapezoidProfile.Constraints Y_CONSTRAINTS = new TrapezoidProfile.Constraints(1.5, 2);
+    private static final TrapezoidProfile.Constraints THETA_CONSTRAINTS = new TrapezoidProfile.Constraints(60, 60);
 
-  public goToLocation(Drive drivebase, List<Pose2d> poses) {
-    this.drivebase = drivebase;
+    private final ProfiledPIDController xController = new ProfiledPIDController(5, 0, .2, X_CONSTRAINTS);
+    private final ProfiledPIDController yController = new ProfiledPIDController(5, 0, .2, Y_CONSTRAINTS);
+    private final ProfiledPIDController thetaController = new ProfiledPIDController(3, 0, 0, THETA_CONSTRAINTS);
 
-    double closest = 99999;
+    @SuppressWarnings("unused")
+    private double xStart = 0;
 
-    for (int i; i < poses.size(); i++)
-    {
-        
-    }
-    this.goalPose = pose;
+    @SuppressWarnings("unused")
+    private double yStart = 0;
 
-    xController.setTolerance(0.05);
-    yController.setTolerance(0.05);
-    thetaController.setTolerance(Units.degreesToRadians(2));
-    thetaController.enableContinuousInput(-Math.PI, Math.PI);
-    // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(drivebase);
-  }
+    @SuppressWarnings("unused")
+    private double thetaStart = 0;
 
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
-    Pose2d robotPose = drivebase.getPose();
-    
-    xController.reset(robotPose.getX());
-    yController.reset(robotPose.getY());
-    thetaController.reset(robotPose.getRotation().getRadians());
+    public goToLocation(Drive drivebase, Pose2d[] poses) {
+        this.drivebase = drivebase;
 
-    xStart = robotPose.getX();
-    yStart = robotPose.getY();
-    thetaStart = robotPose.getRotation().getRadians();
+        double bestDistance = 99999;
 
-    xController.setGoal(goalPose.getX());
-    yController.setGoal(goalPose.getY());
-    thetaController.setGoal(goalPose.getRotation().getRadians());
+        Pose2d bestPose = new Pose2d(-99, -99, new Rotation2d(0));
 
-    SmartDashboard.putNumber("robot Start Pose x", robotPose.getX());
-    SmartDashboard.putNumber("robot Start Pose y", robotPose.getY());
-    SmartDashboard.putNumber("robot Start Pose theta", robotPose.getRotation().getRadians());
+        Pose2d robotPose = this.drivebase.getPose();
 
-    SmartDashboard.putNumber("xController reset location", robotPose.getX());
-    SmartDashboard.putNumber("yController reset location", robotPose.getY());
-    SmartDashboard.putNumber("thetaController reset location", robotPose.getRotation().getRadians());
+        for (int i = 0; i < poses.length; i++) {
+            Pose2d relativePose = poses[i].relativeTo(robotPose);
 
-    SmartDashboard.putNumber("robot Goal Pose x", goalPose.getX());
-    SmartDashboard.putNumber("robot Goal Pose y", goalPose.getY());
-    SmartDashboard.putNumber("robot Goal Pose theta", goalPose.getRotation().getRadians());
+            double distance = Math.sqrt(Math.pow(relativePose.getX(), 2) + Math.pow(relativePose.getY(), 2));
 
-    SmartDashboard.putNumber("xController goal location", goalPose.getX());
-    SmartDashboard.putNumber("yController goal location", goalPose.getY());
-    SmartDashboard.putNumber("thetaController goal location", goalPose.getRotation().getRadians());
-  }
+            if (distance < bestDistance) {
+                bestPose = poses[i];
+            }
+        }
 
-  public double xSpeed;
-  public double ySpeed;
-  public double thetaSpeed;
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() 
-  {
-    Pose2d robotPose = drivebase.getPose();
+        this.goalPose = bestPose;
 
-    xSpeed = -xController.calculate(robotPose.getX());
-    ySpeed = -yController.calculate(robotPose.getY());
-    thetaSpeed = -thetaController.calculate(robotPose.getRotation().getRadians());
-
-    SmartDashboard.putNumber("current estimated x", robotPose.getX());
-    SmartDashboard.putNumber("current estimated y", robotPose.getY());
-    SmartDashboard.putNumber("current estimated rotation", robotPose.getRotation().getRadians());
-
-    SmartDashboard.putNumber("x error", robotPose.getX()-goalPose.getX());
-    SmartDashboard.putNumber("y error", robotPose.getY()-goalPose.getY());
-    SmartDashboard.putNumber("theta error", robotPose.getRotation().getRadians()-goalPose.getRotation().getRadians());
-
-    if (xController.atGoal()) {xSpeed = 0;}
-    if (yController.atGoal()) {ySpeed = 0;}
-    if (thetaController.atGoal()) {thetaSpeed = 0;}
-
-    SmartDashboard.putNumber("x Speed", xSpeed);
-    SmartDashboard.putNumber("y Speed", ySpeed);
-    SmartDashboard.putNumber("theta Speed", thetaSpeed);
-
-    if (xSpeed == 0 && ySpeed == 0 && thetaSpeed == 0){this.cancel();}
-
-    drivebase.runVelocity(new ChassisSpeeds(xSpeed, ySpeed, thetaSpeed));
-  }
-
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-  }
-
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    boolean finished = false;
-    if (xController.atGoal() && yController.atGoal() && thetaController.atGoal()) {
-      finished = true;
-    } else {
-      finished = false;
+        xController.setTolerance(0.05);
+        yController.setTolerance(0.05);
+        thetaController.setTolerance(Units.degreesToRadians(2));
+        thetaController.enableContinuousInput(-Math.PI, Math.PI);
+        // Use addRequirements() here to declare subsystem dependencies.
+        addRequirements(drivebase);
     }
 
-    return finished;
-  }
-  
+    // Called when the command is initially scheduled.
+    @Override
+    public void initialize() {
+        Pose2d robotPose = drivebase.getPose();
+
+        xController.reset(robotPose.getX());
+        yController.reset(robotPose.getY());
+        thetaController.reset(robotPose.getRotation().getRadians());
+
+        xStart = robotPose.getX();
+        yStart = robotPose.getY();
+        thetaStart = robotPose.getRotation().getRadians();
+
+        xController.setGoal(goalPose.getX());
+        yController.setGoal(goalPose.getY());
+        thetaController.setGoal(goalPose.getRotation().getRadians());
+
+        SmartDashboard.putNumber("robot Start Pose x", robotPose.getX());
+        SmartDashboard.putNumber("robot Start Pose y", robotPose.getY());
+        SmartDashboard.putNumber(
+                "robot Start Pose theta", robotPose.getRotation().getRadians());
+
+        SmartDashboard.putNumber("xController reset location", robotPose.getX());
+        SmartDashboard.putNumber("yController reset location", robotPose.getY());
+        SmartDashboard.putNumber(
+                "thetaController reset location", robotPose.getRotation().getRadians());
+
+        SmartDashboard.putNumber("robot Goal Pose x", goalPose.getX());
+        SmartDashboard.putNumber("robot Goal Pose y", goalPose.getY());
+        SmartDashboard.putNumber("robot Goal Pose theta", goalPose.getRotation().getRadians());
+
+        SmartDashboard.putNumber("xController goal location", goalPose.getX());
+        SmartDashboard.putNumber("yController goal location", goalPose.getY());
+        SmartDashboard.putNumber(
+                "thetaController goal location", goalPose.getRotation().getRadians());
+    }
+
+    public double xSpeed;
+    public double ySpeed;
+    public double thetaSpeed;
+    // Called every time the scheduler runs while the command is scheduled.
+    @Override
+    public void execute() {
+        Pose2d robotPose = drivebase.getPose();
+
+        xSpeed = xController.calculate(robotPose.getX());
+        ySpeed = yController.calculate(robotPose.getY());
+        thetaSpeed = thetaController.calculate(robotPose.getRotation().getRadians());
+
+        SmartDashboard.putNumber("current estimated x", robotPose.getX());
+        SmartDashboard.putNumber("current estimated y", robotPose.getY());
+        SmartDashboard.putNumber(
+                "current estimated rotation", robotPose.getRotation().getRadians());
+
+        SmartDashboard.putNumber("x error", robotPose.getX() - goalPose.getX());
+        SmartDashboard.putNumber("y error", robotPose.getY() - goalPose.getY());
+        SmartDashboard.putNumber(
+                "theta error",
+                robotPose.getRotation().getRadians() - goalPose.getRotation().getRadians());
+
+        if (xController.atGoal()) {
+            xSpeed = 0;
+        }
+        if (yController.atGoal()) {
+            ySpeed = 0;
+        }
+        if (thetaController.atGoal()) {
+            thetaSpeed = 0;
+        }
+
+        SmartDashboard.putNumber("x Speed", xSpeed);
+        SmartDashboard.putNumber("y Speed", ySpeed);
+        SmartDashboard.putNumber("theta Speed", thetaSpeed);
+
+        if (xSpeed == 0 && ySpeed == 0 && thetaSpeed == 0) {
+            this.cancel();
+        }
+
+        drivebase.runVelocityOffsets(
+                new ChassisSpeeds(xSpeed, ySpeed, thetaSpeed),
+                goalPose.getRotation().getRadians());
+    }
+
+    // Called once the command ends or is interrupted.
+    @Override
+    public void end(boolean interrupted) {}
+
+    // Returns true when the command should end.
+    @Override
+    public boolean isFinished() {
+        boolean finished = false;
+        if (xController.atGoal() && yController.atGoal() && thetaController.atGoal()) {
+            finished = true;
+        } else {
+            finished = false;
+        }
+
+        return finished;
+    }
 }

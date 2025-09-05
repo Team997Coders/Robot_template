@@ -69,6 +69,16 @@ public class Module {
         io.setTurnPosition(state.angle);
     }
 
+    public void runSetpointOffsets(SwerveModuleState state, double offsets) {
+        // Optimize velocity setpoint
+        state.optimize(new Rotation2d(getAngle().getRadians() + offsets));
+        state.cosineScale(inputs.turnPosition);
+
+        // Apply setpoints
+        io.setDriveVelocity(state.speedMetersPerSecond / wheelRadiusMeters);
+        io.setTurnPosition(new Rotation2d(getAngle().getRadians()));
+    }
+
     /** Runs the module with the specified output while controlling to zero degrees. */
     public void runCharacterization(double output) {
         io.setDriveOpenLoop(output);
