@@ -17,6 +17,7 @@ import static edu.wpi.first.units.Units.*;
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.reduxrobotics.canand.CanandEventLoop;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -30,6 +31,7 @@ import frc.robot.commands.DriveCommands;
 import frc.robot.commands.goToLocation;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.vision.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.ironmaple.simulation.SimulatedArena;
@@ -46,7 +48,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
     // Subsystems
     private final Drive drive;
-    private final Vision vision;
+    // private final Vision vision;
     private SwerveDriveSimulation driveSimulation = null;
 
     // Controller
@@ -55,8 +57,8 @@ public class RobotContainer {
     // Dashboard inputs
     private final LoggedDashboardChooser<Command> autoChooser;
 
-    // private final Pose2d[] potentialLocations = potentialLocations();
-    private final Pose2d[] potentialLocations = {new Pose2d(15, 4, new Rotation2d(0))};
+    private final List<Pose2d> potentialLocations = potentialLocations();
+    // private final Pose2d[] potentialLocations = {new Pose2d(15, 4, new Rotation2d(0))};
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
@@ -64,17 +66,19 @@ public class RobotContainer {
             case REAL:
                 // Real robot, instantiate hardware IO implementations
                 drive = new Drive(
-                        new GyroIOPigeon2(),
+                        new GyroIOCannand(),
                         new ModuleIOSpark(0),
                         new ModuleIOSpark(1),
                         new ModuleIOSpark(2),
                         new ModuleIOSpark(3),
                         (pose) -> {});
 
-                this.vision = new Vision(
-                        drive,
-                        new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
-                        new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation));
+                CanandEventLoop.getInstance();
+
+                // this.vision = new Vision(
+                //         drive,
+                //         new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
+                //         new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation));
 
                 break;
             case SIM:
@@ -92,12 +96,12 @@ public class RobotContainer {
                         new ModuleIOSim(driveSimulation.getModules()[3]),
                         driveSimulation::setSimulationWorldPose);
 
-                vision = new Vision(
-                        drive,
-                        new VisionIOPhotonVisionSim(
-                                camera0Name, robotToCamera0, driveSimulation::getSimulatedDriveTrainPose),
-                        new VisionIOPhotonVisionSim(
-                                camera1Name, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
+                // vision = new Vision(
+                //         drive,
+                //         new VisionIOPhotonVisionSim(
+                //                 camera0Name, robotToCamera0, driveSimulation::getSimulatedDriveTrainPose),
+                //         new VisionIOPhotonVisionSim(
+                //                 camera1Name, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
 
                 break;
             default:
@@ -109,7 +113,7 @@ public class RobotContainer {
                         new ModuleIO() {},
                         new ModuleIO() {},
                         (pose) -> {});
-                vision = new Vision(drive, new VisionIO() {}, new VisionIO() {});
+                // vision = new Vision(drive, new VisionIO() {}, new VisionIO() {});
 
                 break;
         }
@@ -185,8 +189,8 @@ public class RobotContainer {
         }
     }
 
-    public Pose2d[] potentialLocations() {
-        Pose2d[] locations = {null};
+    public List<Pose2d> potentialLocations() {
+        List<Pose2d> locations = new ArrayList<>();
         List<Integer> tagsSource = Arrays.asList(12, 13, 1, 2);
         List<Integer> tagsReef = Arrays.asList(6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 21, 22);
 
@@ -207,7 +211,7 @@ public class RobotContainer {
 
                 double y = location.getY() + Math.cos(rot) * leftRightOffset + Math.sin(rot) * frontBackOffset;
 
-                locations[locations.length - 1] = (new Pose2d(x, y, new Rotation2d(rot)));
+                locations.add(new Pose2d(x, y, new Rotation2d(rot)));
             }
         }
 
@@ -222,7 +226,7 @@ public class RobotContainer {
 
             double y = location.getY() + Math.sin(rot) * frontBackOffset;
 
-            locations[locations.length - 1] = (new Pose2d(x, y, new Rotation2d(rot)));
+            locations.add(new Pose2d(x, y, new Rotation2d(rot + Math.PI)));
         }
 
         return locations;

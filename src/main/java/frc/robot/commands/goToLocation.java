@@ -9,11 +9,14 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.Drive;
+import java.util.ArrayList;
+import java.util.List;
 
 public class goToLocation extends Command {
 
     private Drive drivebase;
     private Pose2d goalPose;
+    private List<Pose2d> poses;
 
     private static final TrapezoidProfile.Constraints X_CONSTRAINTS = new TrapezoidProfile.Constraints(1.5, 2);
     private static final TrapezoidProfile.Constraints Y_CONSTRAINTS = new TrapezoidProfile.Constraints(1.5, 2);
@@ -32,26 +35,9 @@ public class goToLocation extends Command {
     @SuppressWarnings("unused")
     private double thetaStart = 0;
 
-    public goToLocation(Drive drivebase, Pose2d[] poses) {
+    public goToLocation(Drive drivebase, List<Pose2d> poses) {
         this.drivebase = drivebase;
-
-        double bestDistance = 99999;
-
-        Pose2d bestPose = new Pose2d(-99, -99, new Rotation2d(0));
-
-        Pose2d robotPose = this.drivebase.getPose();
-
-        for (int i = 0; i < poses.length; i++) {
-            Pose2d relativePose = poses[i].relativeTo(robotPose);
-
-            double distance = Math.sqrt(Math.pow(relativePose.getX(), 2) + Math.pow(relativePose.getY(), 2));
-
-            if (distance < bestDistance) {
-                bestPose = poses[i];
-            }
-        }
-
-        this.goalPose = bestPose;
+        this.poses = poses;
 
         xController.setTolerance(0.05);
         yController.setTolerance(0.05);
@@ -64,7 +50,27 @@ public class goToLocation extends Command {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
-        Pose2d robotPose = drivebase.getPose();
+        double bestDistance = 99999;
+
+        Pose2d bestPose = new Pose2d(-99, -99, new Rotation2d(0));
+
+        Pose2d robotPose = this.drivebase.getPose();
+
+        List<Double> distances = new ArrayList<>();
+
+        for (int i = 0; i < poses.size(); i++) {
+
+            double distance = Math.sqrt(Math.pow(robotPose.getX() - poses.get(i).getX(), 2)
+                    + Math.pow(robotPose.getY() - poses.get(i).getY(), 2));
+            distances.add(distance);
+
+            if (distance < bestDistance) {
+                bestPose = poses.get(i);
+                bestDistance = distance;
+            }
+        }
+
+        this.goalPose = bestPose;
 
         xController.reset(robotPose.getX());
         yController.reset(robotPose.getY());
@@ -77,25 +83,6 @@ public class goToLocation extends Command {
         xController.setGoal(goalPose.getX());
         yController.setGoal(goalPose.getY());
         thetaController.setGoal(goalPose.getRotation().getRadians());
-
-        SmartDashboard.putNumber("robot Start Pose x", robotPose.getX());
-        SmartDashboard.putNumber("robot Start Pose y", robotPose.getY());
-        SmartDashboard.putNumber(
-                "robot Start Pose theta", robotPose.getRotation().getRadians());
-
-        SmartDashboard.putNumber("xController reset location", robotPose.getX());
-        SmartDashboard.putNumber("yController reset location", robotPose.getY());
-        SmartDashboard.putNumber(
-                "thetaController reset location", robotPose.getRotation().getRadians());
-
-        SmartDashboard.putNumber("robot Goal Pose x", goalPose.getX());
-        SmartDashboard.putNumber("robot Goal Pose y", goalPose.getY());
-        SmartDashboard.putNumber("robot Goal Pose theta", goalPose.getRotation().getRadians());
-
-        SmartDashboard.putNumber("xController goal location", goalPose.getX());
-        SmartDashboard.putNumber("yController goal location", goalPose.getY());
-        SmartDashboard.putNumber(
-                "thetaController goal location", goalPose.getRotation().getRadians());
     }
 
     public double xSpeed;
@@ -110,17 +97,6 @@ public class goToLocation extends Command {
         ySpeed = yController.calculate(robotPose.getY());
         thetaSpeed = thetaController.calculate(robotPose.getRotation().getRadians());
 
-        SmartDashboard.putNumber("current estimated x", robotPose.getX());
-        SmartDashboard.putNumber("current estimated y", robotPose.getY());
-        SmartDashboard.putNumber(
-                "current estimated rotation", robotPose.getRotation().getRadians());
-
-        SmartDashboard.putNumber("x error", robotPose.getX() - goalPose.getX());
-        SmartDashboard.putNumber("y error", robotPose.getY() - goalPose.getY());
-        SmartDashboard.putNumber(
-                "theta error",
-                robotPose.getRotation().getRadians() - goalPose.getRotation().getRadians());
-
         if (xController.atGoal()) {
             xSpeed = 0;
         }
@@ -131,17 +107,15 @@ public class goToLocation extends Command {
             thetaSpeed = 0;
         }
 
-        SmartDashboard.putNumber("x Speed", xSpeed);
-        SmartDashboard.putNumber("y Speed", ySpeed);
-        SmartDashboard.putNumber("theta Speed", thetaSpeed);
-
         if (xSpeed == 0 && ySpeed == 0 && thetaSpeed == 0) {
             this.cancel();
         }
 
-        drivebase.runVelocityOffsets(
-                new ChassisSpeeds(xSpeed, ySpeed, thetaSpeed),
-                goalPose.getRotation().getRadians());
+        double angle = goalPose.getRotation().getRadians();
+        drivebase.runVelocity(new ChassisSpeeds(
+                xSpeed * Math.cos(angle) + ySpeed * Math.sin(angle),
+                ySpeed * Math.cos(-angle) + xSpeed * Math.sin(- angle),
+                thetaSpeed));
     }
 
     // Called once the command ends or is interrupted.

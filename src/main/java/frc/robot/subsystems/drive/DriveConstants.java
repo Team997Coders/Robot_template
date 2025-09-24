@@ -49,15 +49,15 @@ public class DriveConstants {
     public static final int gyroID = 30; // We're using the Redux Gyro: range from 0-1
     public static final double gyroYawConversionFactor = 360; // When you get yaw multiply it by gyroYawConversionFactor
 
-    public static final int frontLeftDriveCanId = 2;
-    public static final int backLeftDriveCanId = 4;
-    public static final int frontRightDriveCanId = 6;
-    public static final int backRightDriveCanId = 8;
+    public static final int frontLeftDriveCanId = 5;
+    public static final int backLeftDriveCanId = 7;
+    public static final int frontRightDriveCanId = 3;
+    public static final int backRightDriveCanId = 1;
 
-    public static final int frontLeftTurnCanId = 1;
-    public static final int backLeftTurnCanId = 3;
-    public static final int frontRightTurnCanId = 5;
-    public static final int backRightTurnCanId = 7;
+    public static final int frontLeftTurnCanId = 6;
+    public static final int backLeftTurnCanId = 8;
+    public static final int frontRightTurnCanId = 4;
+    public static final int backRightTurnCanId = 2;
 
     // Drive motor configuration
     public static final int driveMotorCurrentLimit = 60;
