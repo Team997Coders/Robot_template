@@ -6,7 +6,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.Drive;
 import java.util.ArrayList;
@@ -114,7 +113,7 @@ public class goToLocation extends Command {
         double angle = goalPose.getRotation().getRadians();
         drivebase.runVelocity(new ChassisSpeeds(
                 xSpeed * Math.cos(angle) + ySpeed * Math.sin(angle),
-                ySpeed * Math.cos(-angle) + xSpeed * Math.sin(- angle),
+                ySpeed * Math.cos(-angle) + xSpeed * Math.sin(-angle),
                 thetaSpeed));
     }
 
