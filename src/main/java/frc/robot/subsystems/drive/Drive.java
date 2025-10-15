@@ -39,6 +39,7 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -56,7 +57,7 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
     static final Lock odometryLock = new ReentrantLock();
     private final GyroIO gyroIO;
     private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
-    private final Module[] modules = new Module[4]; // FL, FR, BL, BR
+    public final Module[] modules = new Module[4]; // FL, FR, BL, BR
     private final SysIdRoutine sysId;
     private final Alert gyroDisconnectedAlert =
             new Alert("Disconnected gyro, using kinematics as fallback.", AlertType.kError);
@@ -121,6 +122,13 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
 
     @Override
     public void periodic() {
+        for (int i = 0; i < 4; i++) {
+            SmartDashboard.putNumber(
+                    "Module number " + i + " Turn relative Encoder", modules[i].getTurnRelativeEncoder());
+            SmartDashboard.putNumber(
+                    "Module number " + i + " Turn absolute Encoder", modules[i].getTurnAbsoluteEncoder());
+        }
+
         odometryLock.lock(); // Prevents odometry updates while reading data
         gyroIO.updateInputs(gyroInputs);
         Logger.processInputs("Drive/Gyro", gyroInputs);

@@ -50,4 +50,14 @@ public interface ModuleIO {
 
     /** Run the turn motor to the specified rotation. */
     public default void setTurnPosition(Rotation2d rotation) {}
+
+    /** To be overridden by Module IO Spark */
+    public default double getTurnRelativeEncoder() {
+        return 0;
+    }
+
+    /** To be overridden by Module IO Spark */
+    public default double getTurnAbsoluteEncoder() {
+        return 0;
+    }
 }

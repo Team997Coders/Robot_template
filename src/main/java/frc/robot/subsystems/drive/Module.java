@@ -135,4 +135,12 @@ public class Module {
     public double getFFCharacterizationVelocity() {
         return inputs.driveVelocityRadPerSec;
     }
+
+    public double getTurnRelativeEncoder() {
+        return io.getTurnRelativeEncoder();
+    }
+
+    public double getTurnAbsoluteEncoder() {
+        return io.getTurnAbsoluteEncoder();
+    }
 }
