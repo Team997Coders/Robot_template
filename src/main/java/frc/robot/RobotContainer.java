@@ -21,11 +21,8 @@ import com.reduxrobotics.canand.CanandEventLoop;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -121,34 +118,35 @@ public class RobotContainer {
                 break;
         }
 
-        SmartDashboard.putData("Swerve Drive", new Sendable() {
-            @Override
-            public void initSendable(SendableBuilder builder) {
-                builder.setSmartDashboardType("SwerveDrive");
+        // SmartDashboard.putData("Swerve Drive", new Sendable() {
+        //     @Override
+        //     public void initSendable(SendableBuilder builder) {
+        //         builder.setSmartDashboardType("SwerveDrive");
 
-                builder.addDoubleProperty(
-                        "Front Left Angle", () -> drive.modules[0].getAngle().getRadians(), null);
-                builder.addDoubleProperty(
-                        "Front Left Velocity", () -> drive.modules[0].getVelocityMetersPerSec(), null);
+        //         builder.addDoubleProperty(
+        //                 "Front Left Angle", () -> drive.modules[0].getAngle().getRadians(), null);
+        //         builder.addDoubleProperty(
+        //                 "Front Left Velocity", () -> drive.modules[0].getVelocityMetersPerSec(), null);
 
-                builder.addDoubleProperty(
-                        "Front Right Angle", () -> drive.modules[1].getAngle().getRadians(), null);
-                builder.addDoubleProperty(
-                        "Front Right Velocity", () -> drive.modules[1].getVelocityMetersPerSec(), null);
+        //         builder.addDoubleProperty(
+        //                 "Front Right Angle", () -> drive.modules[1].getAngle().getRadians(), null);
+        //         builder.addDoubleProperty(
+        //                 "Front Right Velocity", () -> drive.modules[1].getVelocityMetersPerSec(), null);
 
-                builder.addDoubleProperty(
-                        "Back Left Angle", () -> drive.modules[2].getAngle().getRadians(), null);
-                builder.addDoubleProperty("Back Left Velocity", () -> drive.modules[2].getVelocityMetersPerSec(), null);
+        //         builder.addDoubleProperty(
+        //                 "Back Left Angle", () -> drive.modules[2].getAngle().getRadians(), null);
+        //         builder.addDoubleProperty("Back Left Velocity", () -> drive.modules[2].getVelocityMetersPerSec(),
+        // null);
 
-                builder.addDoubleProperty(
-                        "Back Right Angle", () -> drive.modules[3].getAngle().getRadians(), null);
-                builder.addDoubleProperty(
-                        "Back Right Velocity", () -> drive.modules[3].getVelocityMetersPerSec(), null);
+        //         builder.addDoubleProperty(
+        //                 "Back Right Angle", () -> drive.modules[3].getAngle().getRadians(), null);
+        //         builder.addDoubleProperty(
+        //                 "Back Right Velocity", () -> drive.modules[3].getVelocityMetersPerSec(), null);
 
-                builder.addDoubleProperty(
-                        "Robot Angle", () -> drive.getRotation().getRadians(), null);
-            }
-        });
+        //         builder.addDoubleProperty(
+        //                 "Robot Angle", () -> drive.getRotation().getRadians(), null);
+        //     }
+        // });
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());

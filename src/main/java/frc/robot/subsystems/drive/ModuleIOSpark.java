@@ -98,11 +98,13 @@ public class ModuleIOSpark implements ModuleIO {
                     default -> 0;
                 });
 
+        turnCanCoder.getSettings().setEphemeral(false);
+
         driveController = driveSpark.getClosedLoopController();
         turnController = turnSpark.getClosedLoopController();
 
         turnRelativeEncoder = turnSpark.getEncoder();
-        turnRelativeEncoder.setPosition(turnCanCoder.getAbsPosition());
+        turnRelativeEncoder.setPosition(turnCanCoder.getAbsPosition() * 2 * Math.PI);
 
         // Configure drive motor
         var driveConfig = new SparkMaxConfig();
@@ -141,11 +143,8 @@ public class ModuleIOSpark implements ModuleIO {
 
         // Configure turn motor
         var turnConfig = new SparkMaxConfig();
-        turnConfig
-                .inverted(turnInverted)
-                .idleMode(IdleMode.kBrake)
-                .smartCurrentLimit(turnMotorCurrentLimit)
-                .voltageCompensation(12.0);
+        turnConfig.inverted(turnInverted).idleMode(IdleMode.kBrake).smartCurrentLimit(turnMotorCurrentLimit);
+        // .voltageCompensation(12.0);
         turnConfig.encoder.positionConversionFactor(turnEncoderPositionFactor);
         // turnConfig
         //         .absoluteEncoder

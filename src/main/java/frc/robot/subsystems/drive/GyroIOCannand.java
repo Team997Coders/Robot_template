@@ -22,7 +22,7 @@ import java.util.Queue;
 
 /** IO implementation for NavX. */
 public class GyroIOCannand implements GyroIO {
-    private final Canandgyro gyro = new Canandgyro(30);
+    private final Canandgyro gyro = new Canandgyro(DriveConstants.gyroID);
     private Queue<Double> yawPositionQueue;
     private Queue<Double> yawTimestampQueue;
 
