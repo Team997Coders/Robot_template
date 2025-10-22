@@ -16,6 +16,7 @@ package frc.robot.subsystems.drive;
 import static frc.robot.subsystems.drive.DriveConstants.*;
 import static frc.robot.util.SparkUtil.*;
 
+import com.reduxrobotics.sensors.canandmag.Canandmag;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
@@ -49,7 +50,10 @@ public class ModuleIOSpark implements ModuleIO {
   private final SparkBase driveSpark;
   private final SparkBase turnSpark;
   private final RelativeEncoder driveEncoder;
-  private final AbsoluteEncoder turnEncoder;
+  //private final AbsoluteEncoder turnEncoder;
+
+  private final Canandmag turnCanCoder;
+  private final RelativeEncoder turnRelativeEncoder;
 
   // Closed loop controllers
   private final SparkClosedLoopController driveController;
@@ -93,8 +97,25 @@ public class ModuleIOSpark implements ModuleIO {
               default -> 0;
             },
             MotorType.kBrushless);
+
+    turnCanCoder = 
+        new Canandmag(
+            switch (module) {
+                case 0 -> frontLeftEncoderId;
+                case 1 -> frontRightEncoderId;
+                case 2 -> backLeftEncoderId;
+                case 3 -> backRightEncoderId;
+                default -> 0;                
+            });
+
+    turnCanCoder.getSettings().setEphemeral(false);
+
+    turnRelativeEncoder = turnSpark.getEncoder();
+    turnRelativeEncoder.setPosition(turnCanCoder.getAbsPosition() * 2 * Math.PI);
+
     driveEncoder = driveSpark.getEncoder();
-    turnEncoder = turnSpark.getAbsoluteEncoder();
+    //turnEncoder = turnSpark.getAbsoluteEncoder();
+
     driveController = driveSpark.getClosedLoopController();
     turnController = turnSpark.getClosedLoopController();
 
@@ -173,7 +194,7 @@ public class ModuleIOSpark implements ModuleIO {
     drivePositionQueue =
         SparkOdometryThread.getInstance().registerSignal(driveSpark, driveEncoder::getPosition);
     turnPositionQueue =
-        SparkOdometryThread.getInstance().registerSignal(turnSpark, turnEncoder::getPosition);
+        SparkOdometryThread.getInstance().registerSignal(turnSpark, turnRelativeEncoder::getPosition);
   }
 
   @Override
@@ -193,9 +214,9 @@ public class ModuleIOSpark implements ModuleIO {
     sparkStickyFault = false;
     ifOk(
         turnSpark,
-        turnEncoder::getPosition,
+        turnRelativeEncoder::getPosition,
         (value) -> inputs.turnPosition = new Rotation2d(value).minus(zeroRotation));
-    ifOk(turnSpark, turnEncoder::getVelocity, (value) -> inputs.turnVelocityRadPerSec = value);
+    ifOk(turnSpark, turnRelativeEncoder::getVelocity, (value) -> inputs.turnVelocityRadPerSec = value);
     ifOk(
         turnSpark,
         new DoubleSupplier[] {turnSpark::getAppliedOutput, turnSpark::getBusVoltage},
