@@ -15,7 +15,6 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Threads;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import org.ironmaple.simulation.SimulatedArena;
@@ -26,7 +25,6 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
-import org.littletonrobotics.urcl.URCL;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to each mode, as
@@ -80,10 +78,10 @@ public class Robot extends LoggedRobot {
         }
 
         // Initialize URCL
-        Logger.registerURCL(URCL.startExternal());
+        // Logger.registerURCL(URCL.startExternal());
 
         // Start AdvantageKit logger
-        Logger.start();
+        // Logger.start();
 
         // Instantiate our RobotContainer. This will perform all our button bindings,
         // and put our autonomous chooser on the dashboard.
@@ -101,8 +99,8 @@ public class Robot extends LoggedRobot {
         // finished or interrupted commands, and running subsystem periodic() methods.
         // This must be called from the robot's periodic block in order for anything in
         // the Command-based framework to work.
-        CommandScheduler.getInstance().run();
-        SmartDashboard.putData(CommandScheduler.getInstance());
+        // CommandScheduler.getInstance().run();
+        // SmartDashboard.putData(CommandScheduler.getInstance());
 
         // Return to normal thread priority
         Threads.setCurrentThreadPriority(false, 10);

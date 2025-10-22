@@ -2,7 +2,6 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
@@ -51,7 +50,7 @@ public class goToLocation extends Command {
     public void initialize() {
         double bestDistance = 99999;
 
-        Pose2d bestPose = new Pose2d(-99, -99, new Rotation2d(0));
+        Pose2d bestPose = new Pose2d();
 
         Pose2d robotPose = this.drivebase.getPose();
 
