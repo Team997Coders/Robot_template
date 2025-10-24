@@ -70,7 +70,7 @@ public class DriveConstants {
 
     // Drive motor configuration
     public static final int driveMotorCurrentLimit = 60;
-    public static final double wheelRadiusMeters = 0.1016 / 2;
+    public static final double wheelRadiusMeters = 0;
     public static final double driveMotorReduction =
             (45.0 * 22.0) / (14 * 15); // 1.0 / 6.75; // MAXSwerve with 14 pinion teeth and 22 spur teeth
     public static final DCMotor driveGearbox = DCMotor.getNEO(1);
