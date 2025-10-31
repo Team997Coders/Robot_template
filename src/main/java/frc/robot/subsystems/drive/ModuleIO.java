@@ -50,4 +50,10 @@ public interface ModuleIO {
 
   /** Run the turn motor to the specified rotation. */
   public default void setTurnPosition(Rotation2d rotation) {}
+
+  public default double getAbsoluteEncoder() {
+    return 0;
+  }
+
+  public default void drive(double speedMetersPerSecond, Rotation2d rotation) {}
 }

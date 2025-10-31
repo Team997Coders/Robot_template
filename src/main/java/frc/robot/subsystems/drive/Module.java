@@ -20,6 +20,8 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import org.littletonrobotics.junction.Logger;
 
 public class Module {
@@ -47,6 +49,7 @@ public class Module {
     io.updateInputs(inputs);
     Logger.processInputs("Drive/Module" + Integer.toString(index), inputs);
 
+
     // Calculate positions for odometry
     int sampleCount = inputs.odometryTimestamps.length; // All signals are sampled together
     odometryPositions = new SwerveModulePosition[sampleCount];
@@ -70,6 +73,10 @@ public class Module {
     // Apply setpoints
     io.setDriveVelocity(state.speedMetersPerSecond / wheelRadiusMeters);
     io.setTurnPosition(state.angle);
+
+    io.drive(state.speedMetersPerSecond / wheelRadiusMeters, state.angle);
+
+    SmartDashboard.putNumber("target Angle", state.angle.getRadians());
   }
 
   /** Runs the module with the specified output while controlling to zero degrees. */
@@ -127,5 +134,9 @@ public class Module {
   /** Returns the module velocity in rad/sec. */
   public double getFFCharacterizationVelocity() {
     return inputs.driveVelocityRadPerSec;
+  }
+
+  public double getAbsoluteEncoder() {
+    return io.getAbsoluteEncoder();
   }
 }

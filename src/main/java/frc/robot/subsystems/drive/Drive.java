@@ -166,6 +166,16 @@ public class Drive extends SubsystemBase {
     }
     odometryLock.unlock();
 
+    SmartDashboard.putNumber("Module number 0 Relative Encoder", modules[0].getAngle().getRadians());
+    SmartDashboard.putNumber("Module number 1 Relative Encoder", modules[1].getAngle().getRadians());
+    SmartDashboard.putNumber("Module number 2 Relative Encoder", modules[2].getAngle().getRadians());
+    SmartDashboard.putNumber("Module number 3 Relative Encoder", modules[3].getAngle().getRadians());
+
+    SmartDashboard.putNumber("Module number 0 Absolute Encoder", modules[0].getAbsoluteEncoder());
+    SmartDashboard.putNumber("Module number 1 Absolute Encoder", modules[1].getAbsoluteEncoder());
+    SmartDashboard.putNumber("Module number 2 Absolute Encoder", modules[2].getAbsoluteEncoder());
+    SmartDashboard.putNumber("Module number 3 Absolute Encoder", modules[3].getAbsoluteEncoder());
+
     // Stop moving when disabled
     if (DriverStation.isDisabled()) {
       for (var module : modules) {

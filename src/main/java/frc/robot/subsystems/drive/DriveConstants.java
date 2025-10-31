@@ -70,7 +70,7 @@ public class DriveConstants {
 
     // Drive motor configuration
     public static final int driveMotorCurrentLimit = 60;
-    public static final double wheelRadiusMeters = 0;
+    public static final double wheelRadiusMeters =  0.1016 / 2;
     public static final double driveMotorReduction =
             (45.0 * 22.0) / (14 * 15); // 1.0 / 6.75; // MAXSwerve with 14 pinion teeth and 22 spur teeth
     public static final DCMotor driveGearbox = DCMotor.getNEO(1);
@@ -80,6 +80,7 @@ public class DriveConstants {
             2 * Math.PI / driveMotorReduction; // Rotor Rotations -> Wheel Radians
     public static final double driveEncoderVelocityFactor =
             (2 * Math.PI) / 60.0 / driveMotorReduction; // Rotor RPM -> Wheel Rad/Sec
+    public static final double absoluteEncoderMultiplier = 2 * Math.PI;
 
     // Drive PID configuration
     public static final double driveKp = 0.0;
@@ -100,7 +101,8 @@ public class DriveConstants {
     // Turn encoder configuration
     public static final boolean turnEncoderInverted = true;
     public static final boolean[] driveMotorInversions = {true, true, true, true};
-    public static final double turnEncoderPositionFactor = (7.0 / 150.0) * (2 * Math.PI); // Rotations -> Radians
+    public static final double turnEncoderPositionFactor =
+    (7.0 / 150.0) * (2 * Math.PI); // Rotations -> Radians 
     public static final double turnEncoderVelocityFactor = (2 * Math.PI) / 60.0; // RPM -> Rad/Sec
 
     // Turn PID configuration
@@ -141,4 +143,11 @@ public class DriveConstants {
                     Meters.of(wheelRadiusMeters),
                     KilogramSquareMeters.of(0.02),
                     wheelCOF));
+
+    public static int maxVoltage = 12;
+    private static final double DRIVE_REDUCTION = 1.0 / 6.75;
+    private static final double NEO_FREE_SPEED = 5820.0 / 60.0;
+    private static final double WHEEL_DIAMETER = 0.1016;
+    public static final double maxVelocity = NEO_FREE_SPEED * DRIVE_REDUCTION * WHEEL_DIAMETER * Math.PI;
+  //private final double MAX_ANGULAR_VELOCITY = MAX_VELOCITY / (ModuleLocations.dist / Math.sqrt(2.0));
 }
