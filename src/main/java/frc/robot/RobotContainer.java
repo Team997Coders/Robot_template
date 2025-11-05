@@ -64,12 +64,12 @@ public class RobotContainer {
 
   private SendableChooser<Command> autoChooser;
 
-  // private static final Camera frontCamera = new Camera("pineapple", new Transform3d(new Translation3d(0.254, 0, 0.1524), new Rotation3d(0, -0.785, 0)));
+  private static final Camera frontCamera = new Camera("pineapple", new Transform3d(new Translation3d(0.254, 0, 0.1524), new Rotation3d(0, -0.785, 0)));
   // private static final Camera backCamera = new Camera("dragonfruit", new Transform3d(new Translation3d(-0.254, 0, 0.1524), new Rotation3d(Math.PI, -0.785, 0)));
 
   // private static final CameraBlock cameraBlock = new CameraBlock(Arrays.asList(frontCamera, backCamera));
 
-  private final Drivebase drivebase = new Drivebase(gyro);
+  private final Drivebase drivebase = new Drivebase(gyro, frontCamera);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.

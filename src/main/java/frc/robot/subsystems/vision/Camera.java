@@ -46,7 +46,6 @@ public class Camera
     public void update(SwerveDrivePoseEstimator poseEstimator, List<PhotonPipelineResult> results)
     {
         this.results = results;
-        SmartDashboard.putNumber("result size", this.results.size());
         if (!this.results.isEmpty())
         {
             for (PhotonPipelineResult result: results)
@@ -58,6 +57,12 @@ public class Camera
                 }
             }
         } 
+    }
+
+    public void update(SwerveDrivePoseEstimator poseEstimator)
+    {
+        List<PhotonPipelineResult> pipelineResults = this.camera.getAllUnreadResults();
+        this.update(poseEstimator, pipelineResults);
     }
 
     public List<PhotonPipelineResult> getResults()

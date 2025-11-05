@@ -36,6 +36,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.DriveConstants.ModuleLocations;
 import frc.robot.Constants.DriveConstants.SwerveModules;
+import frc.robot.subsystems.vision.Camera;
 import frc.robot.subsystems.vision.CameraBlock;
 
 public class Drivebase extends SubsystemBase {
@@ -74,15 +75,16 @@ public class Drivebase extends SubsystemBase {
 
   private BooleanEntry fieldOrientedEntry;
 
-  private CameraBlock cameraBlock;
+  private Camera frontCamera;
 
   /** Creates a new Drivebase. */
-  public Drivebase(Canandgyro gyro) {
+  public Drivebase(Canandgyro gyro, Camera camera) {
     var inst = NetworkTableInstance.getDefault();
     var table = inst.getTable("SmartDashboard");
     this.fieldOrientedEntry = table.getBooleanTopic("Field Oriented").getEntry(true);
 
     this.gyro = gyro;
+    this.frontCamera = camera;
 
     odometry = new SwerveDriveOdometry(kinematics, gyro.getRotation2d(), getPositions());
 
@@ -222,7 +224,7 @@ public class Drivebase extends SubsystemBase {
 
     poseEstimator.update(rotation, positions);
 
-    //this.cameraBlock.update(poseEstimator);
+    frontCamera.update(poseEstimator);
 
     field.setRobotPose(poseEstimator.getEstimatedPosition());
   }
