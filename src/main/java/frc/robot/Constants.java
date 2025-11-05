@@ -165,4 +165,6 @@ public final class Constants {
     public static final int id = 50;
     public static final int ledCount = 50;
   }
+
+  public static final int gyroID = 46;
 }

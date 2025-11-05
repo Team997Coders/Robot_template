@@ -9,6 +9,7 @@ import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import com.reduxrobotics.sensors.canandgyro.Canandgyro;
 import com.studica.frc.AHRS;
 
 import swervelib.SwerveModule;
@@ -46,7 +47,7 @@ public class Drivebase extends SubsystemBase {
 
   private final double MAX_VOLTAGE = 12;
 
-  private AHRS gyro;
+  private Canandgyro gyro;
 
   private SwerveModule frontLeft = new SwerveModule(SwerveModules.frontLeft, MAX_VELOCITY, MAX_VOLTAGE);
   private SwerveModule frontRight = new SwerveModule(SwerveModules.frontRight, MAX_VELOCITY, MAX_VOLTAGE);
@@ -76,7 +77,7 @@ public class Drivebase extends SubsystemBase {
   private CameraBlock cameraBlock;
 
   /** Creates a new Drivebase. */
-  public Drivebase(AHRS gyro) {
+  public Drivebase(Canandgyro gyro) {
     var inst = NetworkTableInstance.getDefault();
     var table = inst.getTable("SmartDashboard");
     this.fieldOrientedEntry = table.getBooleanTopic("Field Oriented").getEntry(true);

@@ -70,7 +70,7 @@ public class SwerveModule {
 
     this.speedEncoder = this.speedMotor.getEncoder();
     encoder.getSettings().setEphemeral(false);
-    encoder.setPosition(angleEncoderOffset);
+    //encoder.setPosition(angleEncoderOffset);
 
     //angleMotor.setSmartCurrentLimit(DriveConstants.currentLimit);
     //speedMotor.setSmartCurrentLimit(DriveConstants.currentLimit);

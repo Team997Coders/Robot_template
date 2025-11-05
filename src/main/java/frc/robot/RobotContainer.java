@@ -19,6 +19,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.events.PointTowardsZoneTrigger;
 import com.pathplanner.lib.path.PathPlannerPath;
+import com.reduxrobotics.sensors.canandgyro.Canandgyro;
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
 
@@ -53,7 +54,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final AHRS gyro = new AHRS(NavXComType.kMXP_SPI);
+  private final Canandgyro gyro = new Canandgyro(Constants.gyroID);
 
   private static XboxController driveStick = new XboxController(0);
 
@@ -147,7 +148,7 @@ public class RobotContainer {
   }
 
   public void resetGyro() {
-    gyro.reset();
+    //gyro();
   }
 
   public double getGyroYaw() {
