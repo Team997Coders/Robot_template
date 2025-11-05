@@ -76,13 +76,12 @@ public class Drivebase extends SubsystemBase {
   private CameraBlock cameraBlock;
 
   /** Creates a new Drivebase. */
-  public Drivebase(AHRS gyro, CameraBlock cameraBlock) {
+  public Drivebase(AHRS gyro) {
     var inst = NetworkTableInstance.getDefault();
     var table = inst.getTable("SmartDashboard");
     this.fieldOrientedEntry = table.getBooleanTopic("Field Oriented").getEntry(true);
 
     this.gyro = gyro;
-    this.cameraBlock = cameraBlock;
 
     odometry = new SwerveDriveOdometry(kinematics, gyro.getRotation2d(), getPositions());
 
@@ -222,7 +221,7 @@ public class Drivebase extends SubsystemBase {
 
     poseEstimator.update(rotation, positions);
 
-    this.cameraBlock.update(poseEstimator);
+    //this.cameraBlock.update(poseEstimator);
 
     field.setRobotPose(poseEstimator.getEstimatedPosition());
   }

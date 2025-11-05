@@ -4,6 +4,7 @@
 
 package swervelib;
 
+import com.reduxrobotics.sensors.canandmag.Canandmag;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -26,11 +27,11 @@ public class SwerveModule {
   private SparkMax speedMotor;
   private RelativeEncoder speedEncoder;
   private PIDController pidController;
-  private SparkAbsoluteEncoder encoder;
+  private Canandmag encoder;
   private double maxVelocity;
   private double maxVoltage;
 
-  public SwerveModule(int angleMotorId, int speedMotorId, boolean driveMotorReversed, boolean angleMotorReversed,
+  public SwerveModule(int angleMotorId, int speedMotorId, int encoderID, boolean driveMotorReversed, boolean angleMotorReversed,
       boolean angleEncoderReversed, double angleEncoderConversionFactor, double angleEncoderOffset,
       double maxVelocity, double maxVoltage) {
     this.angleMotor = new SparkMax(angleMotorId, MotorType.kBrushless);
@@ -40,7 +41,7 @@ public class SwerveModule {
     //this.speedMotor.restoreFactoryDefaults();
 
     this.pidController = new PIDController(SwervePID.p, SwervePID.i, SwervePID.d);
-    this.encoder = this.angleMotor.getAbsoluteEncoder();
+    this.encoder = new Canandmag(encoderID);
     this.maxVelocity = maxVelocity;
     this.maxVoltage = maxVoltage;
 
@@ -68,7 +69,9 @@ public class SwerveModule {
           .velocityConversionFactor(rotationsToDistance/60);
 
     this.speedEncoder = this.speedMotor.getEncoder();
-    
+    encoder.getSettings().setEphemeral(false);
+    encoder.setPosition(angleEncoderOffset);
+
     //angleMotor.setSmartCurrentLimit(DriveConstants.currentLimit);
     //speedMotor.setSmartCurrentLimit(DriveConstants.currentLimit);
 
@@ -78,6 +81,7 @@ public class SwerveModule {
   public SwerveModule(SwerveModuleConfig config, double maxVelocity, double maxVoltage) {
     this(config.angleMotorId,
         config.driveMotorId,
+        config.encoderId,
         config.driveMotorReversed,
         config.angleMotorReversed,
         config.angleEncoderReversed,

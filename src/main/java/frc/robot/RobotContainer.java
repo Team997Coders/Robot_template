@@ -63,12 +63,12 @@ public class RobotContainer {
 
   private SendableChooser<Command> autoChooser;
 
-  private static final Camera frontCamera = new Camera("pineapple", new Transform3d(new Translation3d(0.254, 0, 0.1524), new Rotation3d(0, -0.785, 0)));
-  private static final Camera backCamera = new Camera("dragonfruit", new Transform3d(new Translation3d(-0.254, 0, 0.1524), new Rotation3d(Math.PI, -0.785, 0)));
+  // private static final Camera frontCamera = new Camera("pineapple", new Transform3d(new Translation3d(0.254, 0, 0.1524), new Rotation3d(0, -0.785, 0)));
+  // private static final Camera backCamera = new Camera("dragonfruit", new Transform3d(new Translation3d(-0.254, 0, 0.1524), new Rotation3d(Math.PI, -0.785, 0)));
 
-  private static final CameraBlock cameraBlock = new CameraBlock(Arrays.asList(frontCamera, backCamera));
+  // private static final CameraBlock cameraBlock = new CameraBlock(Arrays.asList(frontCamera, backCamera));
 
-  private final Drivebase drivebase = new Drivebase(gyro, cameraBlock);
+  private final Drivebase drivebase = new Drivebase(gyro);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -179,10 +179,10 @@ public class RobotContainer {
   private void configureBindings() {
     // Gyro Reset
     //c_driveStick.povUp().onTrue(Commands.runOnce(gyro::reset));
-    Command goToTag = new goToTag(drivebase, frontCamera, 0.0);
-    Command stop = new stop(goToTag);
-    JoystickButton button_a = new JoystickButton(driveStick, 1);
-    button_a.onTrue(goToTag).onFalse(stop);
+    //Command goToTag = new goToTag(drivebase, frontCamera, 0.0);
+    // Command stop = new stop(goToTag);
+    // JoystickButton button_a = new JoystickButton(driveStick, 1);
+    // button_a.onTrue(goToTag).onFalse(stop);
   }
 
   /**
