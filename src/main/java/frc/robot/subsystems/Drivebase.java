@@ -166,7 +166,7 @@ public class Drivebase extends SubsystemBase {
    * moduleStates are in meters/sec and radians (for rotation).
    * This can be a source of angle mismatch degrees <> radians
    */
-  private void drive(ChassisSpeeds speeds) {
+  public void drive(ChassisSpeeds speeds) {
     SwerveModuleState[] moduleStates = kinematics.toSwerveModuleStates(speeds, new Translation2d(0, 0));
     SwerveDriveKinematics.desaturateWheelSpeeds(moduleStates, MAX_VELOCITY);
 

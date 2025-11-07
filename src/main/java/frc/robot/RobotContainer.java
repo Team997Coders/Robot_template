@@ -6,9 +6,11 @@ package frc.robot;
 
 import frc.robot.Constants.DriveConstants;
 import frc.robot.commands.Drive;
+import frc.robot.commands.goToLocation;
 import frc.robot.subsystems.Drivebase;
 import frc.robot.subsystems.vision.Camera;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -20,6 +22,9 @@ import com.reduxrobotics.sensors.canandgyro.Canandgyro;
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
 
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -67,6 +72,8 @@ public class RobotContainer {
   // private static final CameraBlock cameraBlock = new CameraBlock(Arrays.asList(frontCamera, backCamera));
 
   private final Drivebase drivebase = new Drivebase(gyro, frontCamera);
+
+  private final List<Pose2d> potentialLocations = potentialLocations();
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -177,11 +184,54 @@ public class RobotContainer {
   private void configureBindings() {
     // Gyro Reset
     //c_driveStick.povUp().onTrue(Commands.runOnce(gyro::reset));
-    //Command goToTag = new goToTag(drivebase, frontCamera, 0.0);
-    // Command stop = new stop(goToTag);
-    // JoystickButton button_a = new JoystickButton(driveStick, 1);
-    // button_a.onTrue(goToTag).onFalse(stop);
+    c_driveStick.x().whileTrue(new goToLocation(drivebase, potentialLocations));
   }
+
+  public List<Pose2d> potentialLocations() {
+    List<Pose2d> locations = new ArrayList<>();
+    List<Integer> tagsSource = Arrays.asList(12, 13, 1, 2);
+    List<Integer> tagsReef = Arrays.asList(6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 21, 22);
+
+    double frontBackOffset = 0.0254 * 18.5;
+    double leftRightOffset = 0.0254 * 6.5;
+
+    for (int i = 0; i < 12; i++) {
+        int tag = tagsReef.get(i);
+
+        Pose2d location = aprilTagLayout.getTagPose(tag).orElseThrow().toPose2d();
+
+        for (int j = 0; j < 2; j++) {
+            leftRightOffset = leftRightOffset * -1;
+
+            double rot = location.getRotation().getRadians();
+
+            double x = location.getX() + Math.cos(rot) * frontBackOffset + Math.sin(rot) * leftRightOffset;
+
+            double y = location.getY() + Math.cos(rot) * leftRightOffset + Math.sin(rot) * frontBackOffset;
+
+            locations.add(new Pose2d(x, y, new Rotation2d(rot)));
+        }
+    }
+
+    for (int i = 0; i < 4; i++) {
+        int tag = tagsSource.get(i);
+
+        
+        Pose2d location = aprilTagLayout.getTagPose(tag).orElseThrow().toPose2d();
+
+        double rot = location.getRotation().getRadians();
+
+        double x = location.getX() + Math.cos(rot) * frontBackOffset;
+
+        double y = location.getY() + Math.sin(rot) * frontBackOffset;
+
+        locations.add(new Pose2d(x, y, new Rotation2d(rot + Math.PI)));
+    }
+
+    return locations;
+  }
+
+
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
