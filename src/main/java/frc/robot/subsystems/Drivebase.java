@@ -37,7 +37,6 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.DriveConstants.ModuleLocations;
 import frc.robot.Constants.DriveConstants.SwerveModules;
 import frc.robot.subsystems.vision.Camera;
-import frc.robot.subsystems.vision.CameraBlock;
 
 public class Drivebase extends SubsystemBase {
   private final double DRIVE_REDUCTION = 1.0 / 6.75;

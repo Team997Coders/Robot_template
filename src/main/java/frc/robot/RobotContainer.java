@@ -6,11 +6,8 @@ package frc.robot;
 
 import frc.robot.Constants.DriveConstants;
 import frc.robot.commands.Drive;
-import frc.robot.commands.goToTag;
-import frc.robot.commands.stop;
 import frc.robot.subsystems.Drivebase;
 import frc.robot.subsystems.vision.Camera;
-import frc.robot.subsystems.vision.CameraBlock;
 
 import java.util.Arrays;
 import java.util.List;
@@ -64,7 +61,7 @@ public class RobotContainer {
 
   private SendableChooser<Command> autoChooser;
 
-  private static final Camera frontCamera = new Camera("pineapple", new Transform3d(new Translation3d(0.254, 0, 0.1524), new Rotation3d(0, -0.785, 0)));
+  private static final Camera frontCamera = new Camera("pineapple", new Transform3d(new Translation3d(0.34, 0.025, 0.013), new Rotation3d(0, 0, 0)));
   // private static final Camera backCamera = new Camera("dragonfruit", new Transform3d(new Translation3d(-0.254, 0, 0.1524), new Rotation3d(Math.PI, -0.785, 0)));
 
   // private static final CameraBlock cameraBlock = new CameraBlock(Arrays.asList(frontCamera, backCamera));
