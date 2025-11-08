@@ -23,6 +23,7 @@ import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
@@ -56,6 +57,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
+  public static AprilTagFieldLayout aprilTagLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
+  
   private final Canandgyro gyro = new Canandgyro(Constants.gyroID);
 
   private static XboxController driveStick = new XboxController(0);
@@ -209,13 +212,12 @@ public class RobotContainer {
 
             double y = location.getY() + Math.cos(rot) * leftRightOffset + Math.sin(rot) * frontBackOffset;
 
-            locations.add(new Pose2d(x, y, new Rotation2d(rot)));
+            locations.add(new Pose2d(x, y, new Rotation2d(rot + Math.PI)));
         }
     }
 
     for (int i = 0; i < 4; i++) {
         int tag = tagsSource.get(i);
-
         
         Pose2d location = aprilTagLayout.getTagPose(tag).orElseThrow().toPose2d();
 
@@ -225,7 +227,7 @@ public class RobotContainer {
 
         double y = location.getY() + Math.sin(rot) * frontBackOffset;
 
-        locations.add(new Pose2d(x, y, new Rotation2d(rot + Math.PI)));
+        locations.add(new Pose2d(x, y, new Rotation2d(rot)));
     }
 
     return locations;

@@ -29,7 +29,7 @@ import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 public class Camera
 {
     private PhotonCamera camera;
-    private AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2024Crescendo);
+    private AprilTagFieldLayout aprilTagFieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeWelded);
     private PhotonPoseEstimator photonPoseEstimator;
 
     private List<PhotonPipelineResult> results;

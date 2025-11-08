@@ -7,6 +7,8 @@ package swervelib;
 import com.reduxrobotics.sensors.canandmag.Canandmag;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkAbsoluteEncoder;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig;
@@ -51,6 +53,8 @@ public class SwerveModule {
     double WHEEL_DIAMETER = 0.1016;
     double rotationsToDistance = driveReduction * WHEEL_DIAMETER * Math.PI;
 
+    this.speedEncoder = this.speedMotor.getEncoder();
+
     SparkBaseConfig angleMotorConfig = new SparkMaxConfig();
         angleMotorConfig
           .inverted(angleMotorReversed)
@@ -68,9 +72,11 @@ public class SwerveModule {
           .positionConversionFactor(rotationsToDistance)
           .velocityConversionFactor(rotationsToDistance/60);
 
-    this.speedEncoder = this.speedMotor.getEncoder();
+    speedMotor.configure(speedMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+    angleMotor.configure(angleMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
     encoder.getSettings().setEphemeral(false);
-    //encoder.setPosition(angleEncoderOffset);
 
     //angleMotor.setSmartCurrentLimit(DriveConstants.currentLimit);
     //speedMotor.setSmartCurrentLimit(DriveConstants.currentLimit);
