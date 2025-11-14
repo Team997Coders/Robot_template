@@ -29,6 +29,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.goToLocation;
+import frc.robot.commands.goToVelocity;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.vision.*;
 import java.util.ArrayList;
@@ -153,6 +154,8 @@ public class RobotContainer {
 
         // Switch to X pattern when X button is pressed
         controller.x().whileTrue(new goToLocation(drive, potentialLocations));
+
+        controller.y().whileTrue(new goToVelocity(drive, potentialLocations));
 
         // Reset gyro / odometry
         final Runnable resetGyro = Constants.currentMode == Constants.Mode.SIM
