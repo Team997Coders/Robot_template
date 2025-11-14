@@ -5,6 +5,7 @@
 package frc.robot;
 
 import frc.robot.Constants.DriveConstants;
+import frc.robot.commands.AutoDrive;
 import frc.robot.commands.Drive;
 import frc.robot.commands.goToTag;
 import frc.robot.commands.stop;
@@ -23,6 +24,7 @@ import com.reduxrobotics.sensors.canandgyro.Canandgyro;
 import com.studica.frc.AHRS;
 import com.studica.frc.AHRS.NavXComType;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -70,17 +72,19 @@ public class RobotContainer {
   // private static final CameraBlock cameraBlock = new CameraBlock(Arrays.asList(frontCamera, backCamera));
 
   private final Drivebase drivebase = new Drivebase(gyro, frontCamera);
-
+ 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
     // Configure the trigger bindings
     drivebase.setDefaultCommand(
-        new Drive(
-            drivebase,
-            () -> getScaledXY(),
-            () -> scaleRotationAxis(driveStick.getRawAxis(4))));
+         new Drive(
+         drivebase,
+             () -> getScaledXY(),
+          () -> scaleRotationAxis(driveStick.getRawAxis(4)))
+  
+    );
 
     autoChooser = AutoBuilder.buildAutoChooser("moveForward");
     SmartDashboard.putData("Auto Choser", autoChooser);
@@ -192,6 +196,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return autoChooser.getSelected();
+  //   return autoChooser.getSelected();
+   return new AutoDrive(drivebase, 0, 0);
   }
 }

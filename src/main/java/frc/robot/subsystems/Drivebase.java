@@ -75,20 +75,19 @@ public class Drivebase extends SubsystemBase {
 
   private BooleanEntry fieldOrientedEntry;
 
-  private Camera frontCamera;
+  private CameraBlock cameraBlock;
 
   /** Creates a new Drivebase. */
-  public Drivebase(Canandgyro gyro, Camera camera) {
+  public Drivebase(Canandgyro gyro2, Camera frontcamera) {
     var inst = NetworkTableInstance.getDefault();
     var table = inst.getTable("SmartDashboard");
     this.fieldOrientedEntry = table.getBooleanTopic("Field Oriented").getEntry(true);
 
-    this.gyro = gyro;
-    this.frontCamera = camera;
+    this.gyro = gyro2;
 
-    odometry = new SwerveDriveOdometry(kinematics, gyro.getRotation2d(), getPositions());
+    odometry = new SwerveDriveOdometry(kinematics, gyro2.getRotation2d(), getPositions());
 
-    poseEstimator = new SwerveDrivePoseEstimator(kinematics, gyro.getRotation2d(), getPositions(), odometry.getPoseMeters());
+    poseEstimator = new SwerveDrivePoseEstimator(kinematics, gyro2.getRotation2d(), getPositions(), odometry.getPoseMeters());
 
     //ModuleConfig ModuleConfig = new ModuleConfig(WHEEL_DIAMETER/2, 3, WHEEL_DIAMETER, DCMotor.getNEO(2), 1.8, 0);
     //RobotConfig config = new RobotConfig(15, 11.25, ModuleConfig, 0.66);
@@ -223,8 +222,6 @@ public class Drivebase extends SubsystemBase {
     odometry.update(rotation, positions);
 
     poseEstimator.update(rotation, positions);
-
-    frontCamera.update(poseEstimator);
 
     field.setRobotPose(poseEstimator.getEstimatedPosition());
   }

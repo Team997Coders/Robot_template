@@ -95,6 +95,10 @@ public final class Constants {
     }
   }
 
+    public static final class AutoDriveConstants {
+      public static final double distance = 1;
+    }
+
   public static final class IntakeConstants {
     public static final int intakeMotorId = 15;
     public static final int indexMotorId = 10;
