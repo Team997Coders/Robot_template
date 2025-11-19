@@ -13,10 +13,10 @@ import swervelib.SwerveModule;
 
 public class AutoDrive extends Command{
 
-    private final Drivebase drivebase;
-    private final double startPos;
-    private final double error;
-    PIDController pid = new PIDController(0, 0, 0);
+    private Drivebase drivebase;
+    private double startPos;
+    private double error;
+    private PIDController pid = new PIDController(1.5, 0, 0);
 
   /** Creates a new Drive. */
   public AutoDrive(Drivebase drivebase, double startPos, double error) {
@@ -34,9 +34,9 @@ public class AutoDrive extends Command{
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    double startPos = drivebase.getPositions()[0].distanceMeters;
-    PIDController pid = new PIDController(0.1, 0, 0);
-    
+    startPos = drivebase.getPositions()[0].distanceMeters; 
+    pid.reset();
+    pid.setSetpoint(Constants.AutoDriveConstants.distance);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -46,8 +46,8 @@ public class AutoDrive extends Command{
     double deltaPos = currentPos - startPos;
     double error = Constants.AutoDriveConstants.distance - deltaPos;
     SmartDashboard.putNumber("auto error", error);
-    pid.setSetpoint(Constants.AutoDriveConstants.distance);
-    drivebase.defaultDrive(pid.calculate(currentPos, Constants.AutoDriveConstants.distance), 0, 0);
+    drivebase.defaultDrive(pid.calculate(deltaPos), 0, 0);
+    SmartDashboard.putNumber("pid output auto", pid.calculate(deltaPos));
   }
 
   // Called once the command ends or is interrupted.
@@ -58,9 +58,6 @@ public class AutoDrive extends Command{
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if (error <= 0){
-        return true;
-    }
     return false;
   }
 }
