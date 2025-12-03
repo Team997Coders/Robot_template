@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.events.PointTowardsZoneTrigger;
 import com.pathplanner.lib.path.PathPlannerPath;
@@ -40,6 +41,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -89,8 +91,13 @@ public class RobotContainer {
             () -> getScaledXY(),
             () -> scaleRotationAxis(driveStick.getRawAxis(4))));
 
-    autoChooser = AutoBuilder.buildAutoChooser("moveForward");
+    NamedCommands.registerCommand("goTo", new goToLocation(drivebase, potentialLocations));
+
+    autoChooser = AutoBuilder.buildAutoChooser("taxi center");
     SmartDashboard.putData("Auto Choser", autoChooser);
+
+    
+    SmartDashboard.putData("Command Scheduler", CommandScheduler.getInstance());
 
     configureBindings();
   }
@@ -195,7 +202,7 @@ public class RobotContainer {
     List<Integer> tagsSource = Arrays.asList(12, 13, 1, 2);
     List<Integer> tagsReef = Arrays.asList(6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 21, 22);
 
-    double frontBackOffset = 0.0254 * 18.5;
+    double frontBackOffset = 0.0254 * 14.5;
     double leftRightOffset = 0.0254 * 6.5;
 
     for (int i = 0; i < 12; i++) {

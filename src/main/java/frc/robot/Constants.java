@@ -22,7 +22,7 @@ import edu.wpi.first.math.util.Units;
  */
 public final class Constants {
   public static final class DriveConstants {
-    public static final double deadband = 0.08;
+    public static final double deadband = 0.02;
     public static final int currentLimit = 40;
     public static final double slewRate = 20; // lower number for higher center of mass
 

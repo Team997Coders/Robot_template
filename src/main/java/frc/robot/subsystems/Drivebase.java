@@ -134,8 +134,7 @@ public class Drivebase extends SubsystemBase {
   }
 
   public void fieldOrientedDrive(double speedX, double speedY, double rot) {
-    ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(speedX, speedY, rot,
-        Rotation2d.fromDegrees(getFieldAngle()));
+    ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(speedX, speedY, rot, gyro.getRotation2d());
     this.drive(speeds);
   }
 
@@ -154,11 +153,12 @@ public class Drivebase extends SubsystemBase {
       speedY = slewRateY.calculate(speedY);
     }
 
-    if (this.fieldOrientedEntry.get(true)) {
-      fieldOrientedDrive(speedX, speedY, rot);
-    } else {
-      robotOrientedDrive(speedX, speedY, rot);
-    }
+    fieldOrientedDrive(speedX, speedY, rot);
+    // if (this.fieldOrientedEntry.get(true)) {
+    //   fieldOrientedDrive(speedX, speedY, rot);
+    // } else {
+    //   robotOrientedDrive(speedX, speedY, rot);
+    // }
   }
 
   /** drive:
@@ -192,6 +192,7 @@ public class Drivebase extends SubsystemBase {
 
   public void resetPose(Pose2d pose2d) {
     odometry.resetPosition(gyro.getRotation2d(), getPositions(), pose2d);
+    poseEstimator.resetPose(pose2d);
   }
 
   public ChassisSpeeds getCurrentSpeeds() {

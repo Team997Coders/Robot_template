@@ -24,7 +24,7 @@ public class goToLocation extends Command {
 
     private final ProfiledPIDController xController = new ProfiledPIDController(5, 0, .2, X_CONSTRAINTS);
     private final ProfiledPIDController yController = new ProfiledPIDController(5, 0, .2, Y_CONSTRAINTS);
-    private final ProfiledPIDController thetaController = new ProfiledPIDController(3, 0, 0, THETA_CONSTRAINTS);
+    private final ProfiledPIDController thetaController = new ProfiledPIDController(8, 0, 0, THETA_CONSTRAINTS);
 
     @SuppressWarnings("unused")
     private double xStart = 0;
@@ -36,6 +36,7 @@ public class goToLocation extends Command {
     private double thetaStart = 0;
 
     public goToLocation(Drivebase drivebase, List<Pose2d> poses) {
+        SmartDashboard.putString("goToLocation status", "Created");
         this.drivebase = drivebase;
         this.poses = poses;
 
@@ -50,6 +51,7 @@ public class goToLocation extends Command {
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
+        SmartDashboard.putString("goToLocation status", "Initiallizing");
         double bestDistance = 99999;
 
         Pose2d bestPose = new Pose2d(-99, -99, new Rotation2d(0));
@@ -83,6 +85,7 @@ public class goToLocation extends Command {
         xController.setGoal(goalPose.getX());
         yController.setGoal(goalPose.getY());
         thetaController.setGoal(goalPose.getRotation().getRadians());
+        SmartDashboard.putString("goToLocation status", "Initialized");
     }
 
     public double xSpeed;
@@ -91,6 +94,7 @@ public class goToLocation extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
+        SmartDashboard.putString("goToLocation status", "executing");
         Pose2d robotPose = drivebase.getPose();
 
         xSpeed = xController.calculate(robotPose.getX());
@@ -120,7 +124,9 @@ public class goToLocation extends Command {
 
     // Called once the command ends or is interrupted.
     @Override
-    public void end(boolean interrupted) {}
+    public void end(boolean interrupted) {
+        SmartDashboard.putString("goToLocation status", "Ended");
+    }
 
     // Returns true when the command should end.
     @Override
