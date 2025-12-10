@@ -6,6 +6,7 @@ package frc.robot;
 
 import frc.robot.Constants.DriveConstants;
 import frc.robot.commands.Drive;
+import frc.robot.commands.DriveAsist;
 import frc.robot.commands.goToLocation;
 import frc.robot.subsystems.Drivebase;
 import frc.robot.subsystems.vision.Camera;
@@ -187,7 +188,8 @@ public class RobotContainer {
   private void configureBindings() {
     // Gyro Reset
     //c_driveStick.povUp().onTrue(Commands.runOnce(gyro::reset));
-    c_driveStick.x().whileTrue(new goToLocation(drivebase, potentialLocations));
+    c_driveStick.x().whileTrue(new DriveAsist(drivebase,
+      () -> getScaledXY(), 21));
   }
 
   public List<Pose2d> potentialLocations() {

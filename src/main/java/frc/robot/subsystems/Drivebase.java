@@ -154,11 +154,12 @@ public class Drivebase extends SubsystemBase {
       speedY = slewRateY.calculate(speedY);
     }
 
-    if (this.fieldOrientedEntry.get(true)) {
-      fieldOrientedDrive(speedX, speedY, rot);
-    } else {
-      robotOrientedDrive(speedX, speedY, rot);
-    }
+    fieldOrientedDrive(speedX, speedY, rot);
+    // if (this.fieldOrientedEntry.get(true)) {
+    //   fieldOrientedDrive(speedX, speedY, rot);
+    // } else {
+    //   robotOrientedDrive(speedX, speedY, rot);
+    // }
   }
 
   /** drive:
