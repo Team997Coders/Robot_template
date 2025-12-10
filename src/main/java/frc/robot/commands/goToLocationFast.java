@@ -22,8 +22,8 @@ public class goToLocationFast extends Command {
     private static final TrapezoidProfile.Constraints Y_CONSTRAINTS = new TrapezoidProfile.Constraints(5, 10);
     private static final TrapezoidProfile.Constraints THETA_CONSTRAINTS = new TrapezoidProfile.Constraints(60, 60);
 
-    private final ProfiledPIDController xController = new ProfiledPIDController(10, 0, .2, X_CONSTRAINTS);
-    private final ProfiledPIDController yController = new ProfiledPIDController(10, 0, .2, Y_CONSTRAINTS);
+    private final ProfiledPIDController xController = new ProfiledPIDController(8, 0, .2, X_CONSTRAINTS);
+    private final ProfiledPIDController yController = new ProfiledPIDController(8, 0, .2, Y_CONSTRAINTS);
     private final ProfiledPIDController thetaController = new ProfiledPIDController(8, 0, 0, THETA_CONSTRAINTS);
 
     @SuppressWarnings("unused")
