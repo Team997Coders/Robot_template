@@ -22,49 +22,48 @@ import edu.wpi.first.math.util.Units;
  */
 public final class Constants {
   public static final class DriveConstants {
-    public static final double deadband = 0.08;
+    public static final double deadband = 0.02;
     public static final int currentLimit = 40;
     public static final double slewRate = 20; // lower number for higher center of mass
 
     public static final class SwervePID {
-      public static final double p = 0.1;
+      public static final double p = 0.0035;
       public static final double i = 0;
       public static final double d = 0;
     }
 
     public static final class SwerveModules {
 
-
       // Front Left Module
       public static final SwerveModuleConfig frontLeft = new SwerveModuleConfig(
-          8,
-          1,
-          52,
-          false,
+          5,
+          6,
+          24,
+          true,
           true,
           false,
           1,
           //.462
-         0);
+          0);
 
       // Front Right
       public static final SwerveModuleConfig frontRight= new SwerveModuleConfig(
-          6,
           7,
-          53,
-          false,
+          8,
+          23,
+          true,
           true,
           false,
           1,
           //0
-          0 );
+          0);
 
       // Back Right
       public static final SwerveModuleConfig backRight = new SwerveModuleConfig(
-          4,
-          5,
-          54,
-          false,
+          1,
+          2,
+          21,
+          true,
           true,
           false,
           1,
@@ -73,10 +72,10 @@ public final class Constants {
 
       // Back Left
       public static final SwerveModuleConfig backLeft = new SwerveModuleConfig(
-          2,
           3,
-          55,
-          false,
+          4,
+          22,
+          true,
           true,
           false,
           1,
@@ -94,33 +93,6 @@ public final class Constants {
       public static final Translation2d backRight = new Translation2d(-dist, -dist);
     }
   }
-
-  public static final class IntakeConstants {
-    public static final int intakeMotorId = 15;
-    public static final int indexMotorId = 10;
-    public static final double indexSpeed = 0.4;
-    public static final double intakeSpeed = 0.7;
-    public static final int noteSensorId = 0;
-
-    public static final int currentLimit = 30;
-  }
-
-  public static final class ClimberConstants {
-    public static final int leftClimberMotorId = 16;
-    public static final int rightClimberMotorId = 14;
-    public static final int leftClimberSensorId = 2;
-    public static final int rightClimberSensorId = 3;
-  }
-
-  public static final class ShooterConstants {
-    public static final int leftShootMotorID = 11;
-    public static final int rightShootMotorID = 12;
-    public static final double shooterSpeed = -1;
-
-    public static final double targetFlywheelVelocity = 3700;
-    public static final int currentLimit = 50;
-  }
-
   public static final class AutoConstants {
     public static final class XPID {
       public static final double p = 1.5;
@@ -166,5 +138,5 @@ public final class Constants {
     public static final int ledCount = 50;
   }
 
-  public static final int gyroID = 46;
+  public static int gyroID = 46;
 }

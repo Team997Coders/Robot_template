@@ -121,6 +121,27 @@ public class Drivebase extends SubsystemBase {
             this // Reference to this subsystem to set requirements
     );
 
+    SmartDashboard.putData("Swerve Drive", new Sendable() {
+      @Override
+      public void initSendable(SendableBuilder builder) {
+        builder.setSmartDashboardType("SwerveDrive");
+    
+        builder.addDoubleProperty("Front Left Angle", () -> frontLeft.getEncoderRadians(), null);
+        builder.addDoubleProperty("Front Left Velocity", () -> frontLeft.getVelocity(), null);
+    
+        builder.addDoubleProperty("Front Right Angle", () -> frontRight.getEncoderRadians(), null);
+        builder.addDoubleProperty("Front Right Velocity", () -> frontRight.getVelocity(), null);
+    
+        builder.addDoubleProperty("Back Left Angle", () -> backLeft.getEncoderRadians(), null);
+        builder.addDoubleProperty("Back Left Velocity", () -> backLeft.getVelocity(), null);
+    
+        builder.addDoubleProperty("Back Right Angle", () -> backRight.getEncoderRadians(), null);
+        builder.addDoubleProperty("Back Right Velocity", () -> backRight.getVelocity(), null);
+    
+        builder.addDoubleProperty("Robot Angle", () -> getFieldAngle(), null);
+      }
+    });
+
     SmartDashboard.putData("Field", field);
   }
 

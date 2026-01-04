@@ -4,6 +4,11 @@
 
 package swervelib;
 
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.reduxrobotics.sensors.canandmag.Canandmag;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkAbsoluteEncoder;
@@ -20,24 +25,32 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.DriveConstants.SwervePID;
 
 /** Add your docs here. */
 public class SwerveModule {
-  private SparkMax angleMotor;
-  private SparkMax speedMotor;
-  private RelativeEncoder speedEncoder;
+  private TalonFX angleMotor;
+  private TalonFX speedMotor;
   private PIDController pidController;
   private Canandmag encoder;
   private double maxVelocity;
   private double maxVoltage;
 
+  private TalonFXConfiguration speedConfig;
+  private TalonFXConfiguration turnConfig;
+  private final SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> constants;
+
+  private double driveReduction = 1.0 / 6.75;
+  private double WHEEL_DIAMETER = 0.1016;
+  private double rotationsToDistance = driveReduction * WHEEL_DIAMETER * Math.PI;
+
   public SwerveModule(int angleMotorId, int speedMotorId, int encoderID, boolean driveMotorReversed, boolean angleMotorReversed,
       boolean angleEncoderReversed, double angleEncoderConversionFactor, double angleEncoderOffset,
       double maxVelocity, double maxVoltage) {
-    this.angleMotor = new SparkMax(angleMotorId, MotorType.kBrushless);
-    this.speedMotor = new SparkMax(speedMotorId, MotorType.kBrushless);
+    this.angleMotor = new TalonFX(angleMotorId);
+    this.speedMotor = new TalonFX(speedMotorId);
 
     //this.angleMotor.restoreFactoryDefaults();
     //this.speedMotor.restoreFactoryDefaults();
@@ -49,39 +62,28 @@ public class SwerveModule {
 
     this.pidController.enableContinuousInput(-180, 180);
 
-    double driveReduction = 1.0 / 6.75;
-    double WHEEL_DIAMETER = 0.1016;
-    double rotationsToDistance = driveReduction * WHEEL_DIAMETER * Math.PI;
+    
 
-    this.speedEncoder = this.speedMotor.getEncoder();
+    constants = new SwerveModuleConstants<>();
 
-    SparkBaseConfig angleMotorConfig = new SparkMaxConfig();
-        angleMotorConfig
-          .inverted(angleMotorReversed)
-          .idleMode(IdleMode.kBrake);
-        angleMotorConfig.absoluteEncoder
-          .positionConversionFactor(1)
-          .velocityConversionFactor(1)
-          .inverted(angleEncoderReversed);
+    speedConfig = new TalonFXConfiguration();
+    speedConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    speedConfig.Slot0 = constants.DriveMotorGains;
+    speedConfig.Feedback.SensorToMechanismRatio = constants.DriveMotorGearRatio;
+    speedConfig.TorqueCurrent.PeakForwardTorqueCurrent = constants.SlipCurrent;
+    speedConfig.TorqueCurrent.PeakReverseTorqueCurrent = -constants.SlipCurrent;
+    speedConfig.CurrentLimits.StatorCurrentLimit = constants.SlipCurrent;
+    speedConfig.CurrentLimits.StatorCurrentLimitEnable = true;
 
-    SparkBaseConfig speedMotorConfig = new SparkMaxConfig();
-        speedMotorConfig
-          .inverted(driveMotorReversed)
-          .idleMode(IdleMode.kBrake);
-        speedMotorConfig.encoder
-          .positionConversionFactor(rotationsToDistance)
-          .velocityConversionFactor(rotationsToDistance/60);
+    speedMotor.getConfigurator().apply(speedConfig, 0.25);
 
-    speedMotor.configure(speedMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    turnConfig = new TalonFXConfiguration();
+    turnConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    turnConfig.Slot0 = constants.SteerMotorGains;
 
-    angleMotor.configure(angleMotorConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    angleMotor.getConfigurator().apply(speedConfig, 0.25);
 
     encoder.getSettings().setEphemeral(false);
-
-    //angleMotor.setSmartCurrentLimit(DriveConstants.currentLimit);
-    //speedMotor.setSmartCurrentLimit(DriveConstants.currentLimit);
-
-    //this.encoder.setZeroOffset(angleEncoderOffset);
   }
 
   public SwerveModule(SwerveModuleConfig config, double maxVelocity, double maxVoltage) {
@@ -113,6 +115,7 @@ public class SwerveModule {
 
     speedMotor.setVoltage(drive_voltage);
     angleMotor.setVoltage(angle_voltage);
+    SmartDashboard.putNumber("angle Motor voltage", angle_voltage);
   }
 
   /**
@@ -121,7 +124,7 @@ public class SwerveModule {
    * @param state of the module (velocity and angle)
    */
   public void drive(SwerveModuleState state) {
-    state.optimize(getRotation());
+    //state.optimize(getRotation());
 
     // a little wierd logic. Call the other 'drive' code above to actually move the
     // module.
@@ -142,7 +145,7 @@ public class SwerveModule {
    * Return the applied voltage on the drive motor (0-12V)
    */
   public double getDriveOutput() {
-    return speedMotor.getAppliedOutput();
+    return speedMotor.get();
   }
 
   /*
@@ -159,19 +162,23 @@ public class SwerveModule {
     return Units.degreesToRadians(getEncoder());
   }
 
+  public double getVelocity() {
+    return speedMotor.getVelocity().getValueAsDouble() * rotationsToDistance;
+  }
+
   /*
    * What is the position of the module using the encoder information.
    * The encoder cinfiguration should be set so that this function will
    * return the valid location in meters.
    */
   public SwerveModulePosition getPosition() {
-    return new SwerveModulePosition(speedEncoder.getPosition(), getRotation());
+    return new SwerveModulePosition(speedMotor.getPosition().getValueAsDouble() * rotationsToDistance, getRotation());
   }
 
   /*
    * Another view of the module state, showing velocity instead of position
    */
   public SwerveModuleState getState() {
-    return new SwerveModuleState(speedEncoder.getVelocity(), getRotation());
+    return new SwerveModuleState(getVelocity(), getRotation());
   }
 }
